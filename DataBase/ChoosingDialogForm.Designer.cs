@@ -34,6 +34,7 @@
             buttoon = new Button();
             Info_Label = new Label();
             button_cancel = new Button();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -94,11 +95,23 @@
             button_cancel.UseVisualStyleBackColor = true;
             button_cancel.Click += button_cancel_Click;
             // 
+            // button1
+            // 
+            button1.Font = new Font("Segoe UI", 12F);
+            button1.Location = new Point(467, 7);
+            button1.Name = "button1";
+            button1.Size = new Size(158, 35);
+            button1.TabIndex = 8;
+            button1.Text = "Справка";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // ChoosingDialogForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(637, 336);
+            Controls.Add(button1);
             Controls.Add(button_cancel);
             Controls.Add(dataGridView1);
             Controls.Add(buttoon);
@@ -116,5 +129,6 @@
         private Button buttoon;
         private Label Info_Label;
         private Button button_cancel;
+        private Button button1;
     }
 }

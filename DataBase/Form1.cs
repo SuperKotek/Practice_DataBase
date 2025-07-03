@@ -68,8 +68,30 @@ namespace DataBase
                     if (SignIn.IsAuthenticated == true)
                     {
                         MessageBox.Show("Авторизация успешна!");
+                        DB_SignIn.Enabled = false;
                         DB_RedactElement.Enabled = true;
                         DB_ConnectingButton.Enabled = true;
+                        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TuzovskyNI_var18.accdb");
+                        PathToFile = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";";
+                        try
+                        {
+                            using (connection = new OleDbConnection(PathToFile))
+                            {
+                                if (connection != null && connection.State == ConnectionState.Open)
+                                {
+                                    connection.Close();
+                                }
+                                connection.Open();
+                                DataTable dataTable = ConnectingToDataBase.GetNamesOfForms(PathToFile);
+                                tables = ConnectingToDataBase.GetAccessTablesBase(PathToFile, dataTable, comboBox1);
+                                ConnectingToDataBase.GetAccessDataBase(PathToFile, dataGridView1, 0, tables);
+                                comboBox1.SelectedIndex = 0;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Ошибка: " + ex.Message);
+                        }
                     }
                     else
                     {

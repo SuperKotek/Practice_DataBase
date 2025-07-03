@@ -98,5 +98,11 @@ namespace DataBase
         {
             this.Close();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Spravka spravka = new Spravka();
+            spravka.ShowDialog();
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace DataBase
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 // Настройки диалогового окна
-                openFileDialog.InitialDirectory = "C:\\Users\\tuzov\\OneDrive\\Рабочий стол\\универ работы\\практика"; // Начальная директория
+                openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory; // Начальная директория
                 openFileDialog.Filter = "Access База Данных (*.accdb)|*.accdb|Access База Данных (*.mdb)|*.mdb";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
