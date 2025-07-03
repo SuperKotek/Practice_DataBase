@@ -10,6 +10,9 @@ using ClosedXML.Excel;
 
 namespace DataBase
 {
+    /// <summary>
+    /// Класс для создания отчетов
+    /// </summary>
     public class ReportGenerator
     {
         /// <summary>
@@ -63,10 +66,12 @@ namespace DataBase
                 MessageBox.Show("Ошибка при экспорте в Excel: " + ex.Message);
             }
         }
-
         /// <summary>
         /// Получает данные из таблицы Access
         /// </summary>
+        /// <param name="PathToFile">Путь к файлу базы данных</param>
+        /// <param name="tableName">Имя выбранной формы</param>
+        /// <returns>Данные из базы данных</returns>
         private static DataTable GetDataFromAccess(string PathToFile, string tableName)
         {
             using (OleDbConnection conn = new OleDbConnection(PathToFile))

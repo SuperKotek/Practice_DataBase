@@ -10,8 +10,15 @@ using System.Data.Common;
 
 namespace DataBase
 {
+    /// <summary>
+    /// Класс для подключения базы данных
+    /// </summary>
     public class ConnectingToDataBase
     {
+        /// <summary>
+        /// Выбор файла базы данных для подключения
+        /// </summary>
+        /// <returns>Строка с полным адрессом подключения</returns>
         public static string GetPathToDataBase()
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -35,6 +42,11 @@ namespace DataBase
                 }
             }
         }
+        /// <summary>
+        /// Получение данных из базы данных для получения списка форм
+        /// </summary>
+        /// <param name="PathToFile">Путь к файлу для подключения</param>
+        /// <returns>Данные из базы данных</returns>
         public static DataTable GetNamesOfForms(string PathToFile)
         {
             try
@@ -52,7 +64,13 @@ namespace DataBase
                 throw new Exception($"Ошибка получения списка форм: {ex.Message}");
             }
         }
-
+        /// <summary>
+        /// Получение списка форм базы данных
+        /// </summary>
+        /// <param name="PathToFile">Путь к файлу для подключения</param>
+        /// <param name="SchemaTable">Данные из базы данных</param>
+        /// <param name="CmbTables">ComboBox, который будет отвечать за переключение между форм</param>
+        /// <returns>Список форм из базы данных</returns>
         public static List<string> GetAccessTablesBase(string PathToFile, DataTable SchemaTable, ComboBox CmbTables)
         {
             List<string> tables = new List<string>();
@@ -83,6 +101,13 @@ namespace DataBase
                 throw new Exception($"Ошибка получения списка форм: {ex.Message}");
             }
         }
+        /// <summary>
+        /// Подключение базы данных к программе, ввод данных в datagridview
+        /// </summary>
+        /// <param name="PathToFile">Путь к файлу для подключения</param>
+        /// <param name="DataGrid">DataGridView, в который выводятся данные текущей формы</param>
+        /// <param name="SelectedInd">Выбранная форма</param>
+        /// <param name="tables">Список форм из базы данных</param>
         public static void GetAccessDataBase(string PathToFile, DataGridView DataGrid, int SelectedInd, List<string> tables)
         {
             try

@@ -9,17 +9,22 @@ using System.Security.Cryptography;
 
 namespace DataBase
 {
+    /// <summary>
+    /// Класс для регистрации и авторизации
+    /// </summary>
     public class SignInDataBase
     {
-        private static string _dbPath = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\tuzov\OneDrive\Рабочий стол\универ работы\практика\DataBase\DataBase\bin\Debug\net9.0-windows\Users.accdb;";
+        // Получения пути к базе данных, которая содержит информацию о пользователях Users.accdb
+        private static string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // Путь к папке с программой
+        private static string path = Path.Combine(appDirectory, "Users.accdb");
+        private static string _dbPath = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";";
 
-        // Инициализация с указанием пути к базе
-        public static void Initialize(string dbPath)
-        {
-            _dbPath = dbPath;
-        }
-
-        // Регистрация нового пользователя
+        /// <summary>
+        /// Регистрация нового пользователя
+        /// </summary>
+        /// <param name="username">Введенный никнейм</param>
+        /// <param name="password">Введенный пароль</param>
+        /// <returns>True - пользователь зарегистрирован, False - ошибка регистрации</returns>
         public static bool Register(string username, string password)
         {
             if (UserExists(username))
@@ -36,7 +41,12 @@ namespace DataBase
                 }
             }
         }
-        // Проверка логина и пароля
+        /// <summary>
+        /// Авторизация пользователя
+        /// </summary>
+        /// <param name="username">Введенный никнейм</param>
+        /// <param name="password">Введенный пароль</param>
+        /// <returns>True - пользователь авторизирован, False - ошибка авторизации</returns>
         public static bool Login(string username, string password)
         {
             using (var connection = new OleDbConnection(_dbPath))
@@ -52,6 +62,11 @@ namespace DataBase
                 }
             }
         }
+        /// <summary>
+        /// Проверка на существования пользователя
+        /// </summary>
+        /// <param name="username">Никнейм пользователя</param>
+        /// <returns>True - существует, False - не существует</returns>
         private static bool UserExists(string username)
         {
             using (var connection = new OleDbConnection(_dbPath))

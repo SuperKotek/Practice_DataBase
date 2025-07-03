@@ -11,78 +11,18 @@ using System.Threading.Tasks;
 
 namespace DataBase
 {
+    /// <summary>
+    /// Класс для получения необходимых данных для редактирования базы данных
+    /// </summary>
     public class EditingDataBase
     {
-        public static int AddRecordToForm(string PathToFile, string tableName, Dictionary<string, object> conditions, OleDbConnection connection)
-        {
-            try
-            {
-                using (connection = new OleDbConnection(PathToFile))
-                {
-                    // Формируем SQL-запрос
-                    string columns = string.Join(", ", conditions.Keys.Select(k => "[" + k + "]"));
-                    string parameters = string.Join(", ", conditions.Keys.Select(k => "?"));
-
-                    string query = $"INSERT INTO [{tableName}] ({columns}) VALUES ({parameters})";
-
-                    using (OleDbCommand command = new OleDbCommand(query, connection))
-                    {
-                        // Добавляем параметры (порядок важен для Access)
-                        foreach (var values in conditions)
-                        {
-                            command.Parameters.AddWithValue("?", values.Value ?? DBNull.Value);
-                        }
-                        // Открываем соединение, если оно закрыто
-                        if (connection.State != System.Data.ConnectionState.Open)
-                        { connection.Open(); }
-
-                        return command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при добавлении записи: {ex.Message}");
-                return 0;
-            }
-        }
         /// <summary>
-        /// Удаляет строки по нескольким условиям
+        /// Получение списка имен столбцов и их форматов
         /// </summary>
-        /// <param name="tableName">Имя таблицы</param>
-        /// <param name="conditions">Словарь условий (столбец-значение)</param>
-        /// <returns>Количество удаленных строк</returns>
-        public static int RemoveRecordFromForm(string PathToFile, string tableName, Dictionary<string, object> conditions, OleDbConnection connection)
-        {
-            try
-            {
-                using (connection = new OleDbConnection(PathToFile))
-                {
-                    // Формируем WHERE часть запроса
-                    string whereClause = string.Join(" AND ", conditions.Keys.Select(c => $"[{c}] = ?"));
-                    string query = $"DELETE FROM [{tableName}] WHERE {whereClause}";
-
-                    using (OleDbCommand command = new OleDbCommand(query, connection))
-                    {
-                        // Добавляем параметры в том же порядке, что и условия
-                        foreach (var value in conditions.Values)
-                        {
-                            command.Parameters.AddWithValue("?", value ?? DBNull.Value);
-                        }
-                        // Открываем соединение, если оно закрыто
-                        if (connection.State != System.Data.ConnectionState.Open)
-                        { connection.Open(); }
-                        // Выполняем запрос
-                        return command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при удалении записей: {ex.Message}");
-                return 0;
-            }
-        }
+        /// <param name="PathToFile">Путь к файлу для подключения</param>
+        /// <param name="tableName">Имя формы, из которой берутся данные</param>
+        /// <param name="connection">Подключение</param>
+        /// <returns>Кортеж списков (список имен столбцов и список их форматов)</returns>
         public static (List<string>, List<string>) GetTableColumns(string PathToFile, string tableName, OleDbConnection connection)
         {
             List<string> columns = new List<string>();
@@ -111,6 +51,11 @@ namespace DataBase
                 return (columns, datatypes);
             }
         }
+        /// <summary>
+        /// Обработка форматов в текстовый вариант
+        /// </summary>
+        /// <param name="oleDbType">Число, обозначающее формат</param>
+        /// <returns>Строка с типом данных</returns>
         private static string GetOleDbTypeName(int oleDbType)
         {
             switch (oleDbType)
@@ -133,60 +78,19 @@ namespace DataBase
             }
         }
     }
-    public class DataGridEditor
-    {
-        public static void SaveChanges(string PathToFile, DataGridView dataGridView, string tableName)
-        {
-            try
-            {
-                var dbEditor = new DatabaseEditor();
-                var changes = new List<Dictionary<string, object>>();
-
-                // Собираем измененные строки
-                foreach (DataGridViewRow row in dataGridView.Rows)
-                {
-                    if (row.IsNewRow || !row.IsDirty()) continue;
-
-                    var rowValues = new Dictionary<string, object>();
-                    foreach (DataGridViewCell cell in row.Cells)
-                    {
-                        rowValues[dataGridView.Columns[cell.ColumnIndex].Name] = cell.Value;
-                    }
-                    changes.Add(rowValues);
-                }
-
-                // Применяем изменения
-                foreach (var change in changes)
-                {
-                    var id = change["ID"]; // Предполагаем наличие ID
-                    var where = new Dictionary<string, object> { { "ID", id } };
-
-                    dbEditor.UpdateRecord(PathToFile, tableName, change, where);
-                }
-
-                MessageBox.Show($"Сохранено {changes.Count} изменений");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка сохранения: {ex.Message}");
-            }
-        }
-    }
-    public static class DataGridViewExtensions
-    {
-        public static bool IsDirty(this DataGridViewRow row)
-        {
-            return row.Cells.Cast<DataGridViewCell>().Any(c => c.IsDirty());
-        }
-
-        public static bool IsDirty(this DataGridViewCell cell)
-        {
-            return cell.Value != null && !cell.Value.Equals(cell.OwningColumn.DefaultCellStyle?.NullValue);
-        }
-    }
+    /// <summary>
+    /// Класс для сохранения изменений в базе данных
+    /// </summary>
     public class DatabaseEditor
     {
-        // Основной метод для обновления записей
+        /// <summary>
+        /// Сохранение изменений в базе данных
+        /// </summary>
+        /// <param name="PathToFile">Путь к файлу для подключения</param>
+        /// <param name="tableName">Имя формы, в которой происходит изменение</param>
+        /// <param name="updateValues">Обновленные значения</param>
+        /// <param name="whereConditions">Описание, куда были занесены изменения</param>
+        /// <returns>True - обновление произошло, False - не произошло</returns>
         public bool UpdateRecord(string PathToFile, string tableName, Dictionary<string, object> updateValues, Dictionary<string, object> whereConditions)
         {
             try
